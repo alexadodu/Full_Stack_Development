@@ -2,7 +2,7 @@
 // DATE: JUN 2024
 
 /*
- *Implementation of an interactive menu system for Bottega Diner in JavaScript:
+ *Implementation of an interactive menu system in JavaScript:
     - Presents separate menus for breakfast, lunch, and dinner.
     - Allows the client to choose one main dish and two side dishes.
     - Provides random comments on client selections.
