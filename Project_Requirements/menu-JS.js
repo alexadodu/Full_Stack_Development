@@ -5,7 +5,7 @@
  *Implementation of an interactive menu system in JavaScript:
     - Presents separate menus for breakfast, lunch, and dinner.
     - Allows the client to choose one main dish and two side dishes.
-    - Provides random comments on client selections.
+    - Provides random comments on client selections and their price.
     - Calculates and displays the ticket with the total price based on the choices made.
  */
 
