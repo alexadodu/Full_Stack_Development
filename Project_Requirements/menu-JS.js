@@ -71,12 +71,6 @@ function printFullMenu() {
     console.log('\tPrincipales (a elegir 1)');
     lunchDinnerMenu.mainMenu.forEach(item => {
         console.log(`\t - nº ${item.id}) ${item.name}`);
-        if (item.extras) {
-            console.log('\t\tIngredientes extras:');
-            item.extras.forEach(extra => {
-                console.log(`\t\t\t${extra.name}: ${extra.price.toFixed(2)} €`);
-            });
-        };
     });
     console.log('\tAcompañamientos (a elegir 2)');
     lunchDinnerMenu.sideMenu.forEach(item => {
@@ -109,7 +103,7 @@ function totalPrice(prices) {
 }
 
 
-// Selection of dishes and drink, with the final display of the ticket with the total price.
+// Selection of dishes and drink, with the final display of the ticket with total price.
 function menuSelection(menuType, mealType) {
     let selectedMainMenu;
     let selectedSideMenu1;
