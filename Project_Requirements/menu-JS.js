@@ -2,10 +2,10 @@
 // DATE: JUN 2024
 
 /*
- *Implementation of an interactive menu system in JavaScript:
-    - Presents separate menus for breakfast, lunch, and dinner.
-    - Allows the client to choose one main dish and two side dishes.
-    - Provides random comments on client selections and their price.
+ *Implementation of an interactive menu system for Bottega Diner in JavaScript:
+    - Presents separate menus for breakfast, lunch, and dinner depending on the selected time.
+    - Allows the client to choose one main dish, one side dish and drink.
+    - Provides random comments on client selections.
     - Calculates and displays the ticket with the total price based on the choices made.
  */
 
@@ -50,39 +50,6 @@ const lunchDinnerMenu = {
 };
 
 
-function printFullMenu() {
-    // Breakfast
-    console.log('--- MENÚ DE DESAYUNO ---');
-    console.log('\tPrincipales (a elegir 1)');
-    breakfastMenu.mainMenu.forEach(item => {
-        console.log(`\t - nº ${item.id}) ${item.name}`);
-    });
-    console.log('\tAcompañamientos (a elegir 2)');
-    breakfastMenu.sideMenu.forEach(item => {
-        console.log(`\t - nº ${item.id}) ${item.name}`);
-    });
-    console.log('\tBebidas');
-    breakfastMenu.drinks.forEach(item => {
-        console.log(`\t - nº ${item.id}) ${item.name}`);
-    });
-
-    // Lunch and dinner
-    console.log('--- MENÚ DE ALMUERZO Y CENA ---');
-    console.log('\tPrincipales (a elegir 1)');
-    lunchDinnerMenu.mainMenu.forEach(item => {
-        console.log(`\t - nº ${item.id}) ${item.name}`);
-    });
-    console.log('\tAcompañamientos (a elegir 2)');
-    lunchDinnerMenu.sideMenu.forEach(item => {
-        console.log(`\t - nº ${item.id}) ${item.name}`);
-    });
-    console.log('\tBebidas');
-    lunchDinnerMenu.drinks.forEach(item => {
-        console.log(`\t - nº ${item.id}) ${item.name}`);
-    });
-};
-
-
 function getRandomComment() {
     const comments = [
         "¡Gran elección!",
@@ -103,11 +70,41 @@ function totalPrice(prices) {
 }
 
 
-// Selection of dishes and drink, with the final display of the ticket with total price.
+// Selection of dishes and drink, with the final display of the ticket with the total price.
 function menuSelection(menuType, mealType) {
+    // Printing selected menu
+    let menuHeader = '';
+
+    switch (mealType) {
+        case 'lunch':
+            menuHeader = '--- MENÚ DE ALMUERZO ---';
+            break;
+        case 'dinner':
+            menuHeader = '--- MENÚ DE CENA ---';
+            break;
+        default:
+            menuHeader = '--- MENÚ DE DESAYUNO ---';
+    };
+
+    function gettingItemsPrice(item) {
+        if (mealType === 'lunch') {
+            return item.lunchPrice.toFixed(2) + ' €';
+        } else if (mealType === 'dinner') {
+            return item.dinnerPrice.toFixed(2) + ' €';
+        } else {
+            return item.price.toFixed(2) + ' €';
+        }
+    }
+
+    const mainMenuSection = menuType.mainMenu.map( item => `    - nº ${item.id}) ${item.name} (${gettingItemsPrice(item)})` ).join('\n');
+    const sideMenuSection = menuType.sideMenu.map( item => `    - nº ${item.id}) ${item.name} (${gettingItemsPrice(item)})` ).join('\n');
+    const drinksSections = menuType.drinks.map( item => `   - nº ${item.id}) ${item.name} (${gettingItemsPrice(item)})` ).join('\n');
+
+    alert(`${menuHeader}\nPLATOS PRINCIPALES\n${mainMenuSection}\n\nACOMPAÑAMIENTOS\n${sideMenuSection}\n\nBEBIDAS\n${drinksSections}`);
+
+    // Items selection
     let selectedMainMenu;
-    let selectedSideMenu1;
-    let selectedSideMenu2;
+    let selectedSideMenu;
     let selectedDrink;
     let selectedItemsPrices = [];
 
@@ -115,10 +112,10 @@ function menuSelection(menuType, mealType) {
         let continueSelection = true;
 
         while (continueSelection) {
-            let inputItem = prompt(`Introduzca el número del/la ${itemType} que va a desear:`);
+            let inputItem = prompt(`Introduzca el número del/la ${itemType} que va a desear:\n${itemType === 'plato principal' ? mainMenuSection : itemType === 'acompañamiento' ? sideMenuSection : drinksSections}`);
     
             if (inputItem === null) {
-                console.log('El cliente ha cancelado el proceso.');
+                console.log(`El cliente ha cancelado el proceso de selección de plato/bebida.`);
                 return null; 
             }
     
@@ -131,19 +128,21 @@ function menuSelection(menuType, mealType) {
             let selectedItem = menu.find(item => item.id === selectedItemID);
     
             if (selectedItem) {
-                let itemPrice = selectedItem.price;
-
+                let itemPrice;
+                    
                 if (mealType === 'lunch') {
                     itemPrice = selectedItem.lunchPrice;
                 } else if (mealType === 'dinner') {
                     itemPrice = selectedItem.dinnerPrice;
-                } 
+                } else {
+                    itemPrice = selectedItem.price;
+                }
 
                 const confirmation = prompt(`Has elegido ${selectedItem.name}. ¿Desea continuar con tu elección? (S/N)`).toLocaleLowerCase();
 
                 if (confirmation === 's') {
                     continueSelection = false;
-                    alert(`${getRandomComment()} El precio es de ${itemPrice.toFixed(2)} €.`);
+                    alert(`${getRandomComment()}`);
                     return { ...selectedItem, price: itemPrice };
                 } else if (confirmation === 'n') {
                     alert(`Vuelve a seleccionar tu ${itemType}.`);
@@ -160,55 +159,75 @@ function menuSelection(menuType, mealType) {
     selectedMainMenu = itemSelection(menuType.mainMenu, 'plato principal');
     if (!selectedMainMenu) return;
 
-    selectedSideMenu1 = itemSelection(menuType.sideMenu, 'primer acompañamiento');
-    if (!selectedSideMenu1) return;
-
-    selectedSideMenu2 = itemSelection(menuType.sideMenu, 'segundo acompañamiento');
-    if (!selectedSideMenu2) return;
+    selectedSideMenu = itemSelection(menuType.sideMenu, 'acompañamiento');
+    if (!selectedSideMenu) return;
 
     selectedDrink = itemSelection(menuType.drinks, 'bebida');
     if (!selectedDrink) return;
 
     selectedItemsPrices.push(selectedMainMenu.price);
-    selectedItemsPrices.push(selectedSideMenu1.price);
-    selectedItemsPrices.push(selectedSideMenu2.price);
+    selectedItemsPrices.push(selectedSideMenu.price);
     selectedItemsPrices.push(selectedDrink.price);
 
-    console.log(`CUENTA FINAL DEL MENÚ ELEGIDO:
+    alert(`CUENTA FINAL DEL MENÚ ELEGIDO:
 
         - Plato principal: ${selectedMainMenu.name} (${selectedMainMenu.price.toFixed(2)} €)
-        - Primer acompañamiento: ${selectedSideMenu1.name} (${selectedSideMenu1.price.toFixed(2)} €)
-        - Segundo acompañamiento: ${selectedSideMenu2.name} (${selectedSideMenu2.price.toFixed(2)} €)
+        - Acompañamiento: ${selectedSideMenu.name} (${selectedSideMenu.price.toFixed(2)} €)
         - Bebida: ${selectedDrink.name} (${selectedDrink.price.toFixed(2)} €)
         
-        TOTAL: ${totalPrice(selectedItemsPrices)} €`);
+        TOTAL: ${totalPrice(selectedItemsPrices)} €
+        
+    ¡Muchas gracias por apoyar este negocio!`);
 };
 
 
-// Selection of the type of menu (breakfast, lunch or dinner)
-function menuTypeSelection() {
-    let inputMenu;
-    
-    while (true) {
-        inputMenu = prompt('Elige tipo de menú (desayuno, almuerzo o cena):').toLowerCase();
 
-        if (inputMenu === 'desayuno' || inputMenu === 'almuerzo' || inputMenu === 'cena') {
-            break; 
+
+
+// Selection of menu (breakfast, lunch or dinner)
+function menuTypeSelection() {
+    const currentTime = moment().format('HH:mm');
+    const breakfastOpeningTime = moment('09:00', 'HH:mm');
+    const lunchOpeningTime = moment('13:00', 'HH:mm');
+    const dinnerOpeningTime = moment('20:00', 'HH:mm');
+    const dinnerClosingTime = moment('23:30', 'HH:mm');
+    
+    let inputTime = prompt('¡Bienvenido/a! Introduce una hora para poder elegir el menú (HH:mm):', currentTime);
+
+    if (inputTime === null) {
+        console.log('El cliente ha cancelado la selección de menú.');
+        return; 
+    }
+
+    while (true) {
+        while (!moment(inputTime, 'HH:mm', true).isValid()) {
+            inputTime = prompt('La hora no es válida. Por favor, inténtalo de nuevo, usando el formato HH:mm. Gracias.', currentTime);
+            if (inputTime === null) {
+                console.log('El cliente ha cancelado la selección de menú.');
+                return; 
+            }
+        }
+    
+        const selectedTime = moment(inputTime, 'HH:mm');
+    
+        if (selectedTime.isBetween(breakfastOpeningTime, lunchOpeningTime, null, '[)')) {
+            menuSelection(breakfastMenu);
+            break;
+        } else if (selectedTime.isBetween(lunchOpeningTime, dinnerOpeningTime, null, '[)')) {
+            menuSelection(lunchDinnerMenu, 'lunch');
+            break;
+        } else if (selectedTime.isBetween(dinnerOpeningTime, dinnerClosingTime, null, '[]')) {
+            menuSelection(lunchDinnerMenu, 'dinner');
+            break;
         } else {
-            alert("Menú no válido. Inténtalo de nuevo.");
+            inputTime = prompt("Lo sentimos, estamos cerrados a esa hora. Introduce una hora dentro de nuestro horario de apertura (HH:mm):", currentTime);
+            if (inputTime === null) {
+                console.log('El cliente ha cancelado la selección de menú.');
+                return; 
+            }
         }
     }
-    
-    if (inputMenu === 'desayuno') {
-        menuSelection(breakfastMenu);
-    } else if (inputMenu === 'almuerzo') {
-        menuSelection(lunchDinnerMenu, 'lunch');
-    } else {
-        menuSelection(lunchDinnerMenu, 'dinner');
-    }
 };
 
 
-
-printFullMenu();
 menuTypeSelection();
