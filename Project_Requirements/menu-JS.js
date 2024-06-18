@@ -181,9 +181,6 @@ function menuSelection(menuType, mealType) {
 };
 
 
-
-
-
 // Selection of menu (breakfast, lunch or dinner)
 function menuTypeSelection() {
     const currentTime = moment().format('HH:mm');
